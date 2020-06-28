@@ -3,13 +3,13 @@
 import cv2
 import os
 import numpy as np
-from cal_overlap import cal_overlap
+from .cal_overlap import cal_overlap
 
 
 # 每张图片候选负样本图片的数目
-selectNum = 10
+selectNum = 2
 # 重叠区域小于该值选择为负例
-overlapThre = 0.4
+overlapThre = 0.5
 # 输出形状大小
 # 因为标签人脸框为正方形
 # 这里也尽量保持正方形，避免图像比例失调
