@@ -3,6 +3,7 @@ import os
 import numpy as np
 import pickle
 
+
 def normalization(img):
     # 图片的标准化
     mean = np.mean(img)
@@ -29,7 +30,6 @@ def imgShow(winname = 'show', img= None):
     cv2.namedWindow(winname, cv2.WINDOW_NORMAL)
     cv2.imshow(winname, img)
     cv2.waitKey(0)
-    cv2.destroyAllWindows()
 
 def readImgCollection(posPath, negPath):
 

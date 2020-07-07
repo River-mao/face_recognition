@@ -1,15 +1,19 @@
 # Author: River Mao
+# 图片裁剪
+# 生成正负例集合
 
 import cv2
 import os
 import numpy as np
-from .cal_overlap import cal_overlap
-
+from cal_overlap import cal_overlap
+from tool import normalization
 
 # 每张图片候选负样本图片的数目
-selectNum = 2
+selectNum = 50
 # 重叠区域小于该值选择为负例
-overlapThre = 0.5
+overlapThre1_1 = 0.25
+overlapThre1_0 = 0.10
+overlapThre2 = 0.85
 # 输出形状大小
 # 因为标签人脸框为正方形
 # 这里也尽量保持正方形，避免图像比例失调
@@ -21,8 +25,16 @@ dsize = (24, 24)
 # 2 重叠阈值
 # 3 每张图片候选负样本图片的数目
 
-posPath = '../samples/size_'+str(dsize[0])+'_t_'+str(int(100*overlapThre))+'_num_'+str(selectNum)+'/pos'
-negPath = '../samples/size_'+str(dsize[0])+'_t_'+str(int(100*overlapThre))+'_num_'+str(selectNum)+'/neg'
+# 初始化保存路径
+posPath = '../samples/size_'+str(dsize[0])+'_t_'\
+          + str(int(100*overlapThre1_0)) + 'to' + str(int(100* overlapThre1_1))\
+          + '_' + str(int(100*overlapThre2))\
+          + '_num_'+str(selectNum)+'/pos'
+
+negPath = '../samples/size_'+str(dsize[0])+'_t_'\
+          + str(int(100*overlapThre1_0)) + 'to' + str(int(100* overlapThre1_1))\
+          + '_' + str(int(100*overlapThre2))\
+          + '_num_'+str(selectNum)+'/neg'
 
 def randomArea(imgSize, edges):
     startArea = imgSize[0]-edges, imgSize[1]-edges
@@ -62,6 +74,7 @@ if __name__ == '__main__':
             imgPath = datasetPath + label[0]
             img = cv2.imread(imgPath)
             grayImg = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+
             imgSize = np.shape(grayImg)
 
             # 因为标签框为正方形框，所以记录label[3]或者label[4]其中之一就可以
@@ -78,17 +91,24 @@ if __name__ == '__main__':
             cv2.imwrite(posPath+ '/'+ className + str(imgindex)+'.png', posImg)
 
             # 截取负样本区
-            sample_index = 0
+            neg_index = 0
+            pos_index = 0
             for k in range(selectNum):
                 ROI2P = randomArea(imgSize, edges)
                 overlapRatio = cal_overlap(ROI1P, ROI2P, grayImg)
-                if overlapRatio < overlapThre:
-                    sample_index += 1
+
+                if (overlapRatio < overlapThre1_1) & (overlapRatio > overlapThre1_0):
+                    neg_index += 1
                     negImg = grayImg[ROI2P[0]:ROI2P[0]+edges,ROI2P[1]:ROI2P[1]+edges]
                     negImg = cv2.resize(negImg, dsize)
                     if not os.path.exists(negPath):
                         os.makedirs(negPath)
 
-                    cv2.imwrite(negPath + '/' + className + str(imgindex)+'_'+str(sample_index)+'.png', negImg)
+                    cv2.imwrite(negPath + '/' + className + str(imgindex)+'_'+str(neg_index)+'.png', negImg)
 
+                elif overlapRatio > overlapThre2:
+                    pos_index += 1
+                    posImg = grayImg[ROI2P[0]:ROI2P[0] + edges, ROI2P[1]:ROI2P[1] + edges]
+                    posImg = cv2.resize(posImg, dsize)
+                    cv2.imwrite(posPath + '/' + className + str(imgindex) + '_' + str(pos_index) + '.png', posImg)
                     #imgShow("negImg", negImg)

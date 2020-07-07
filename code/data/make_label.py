@@ -1,17 +1,15 @@
 # Author: River Mao
+# 制作图像标签， 手动框出人脸区域（正方形）并保存左上角点与边长
+
 import os
 import cv2
 import numpy as np
 
-current_pos = None
-tl = None
-br = None
 
-#鼠标事件
+#利用opencv的鼠标事件在原图上手动选择ROI区域，并保存ROI区域的参数
 def get_rect(im, title='get_rect'):   #   (a,b) = get_rect(im, title='get_rect')
-    mouse_params = {'tl': None, 'br': None, 'current_pos': None,
-        'released_once': False}
 
+    mouse_params = {'tl': None, 'br': None, 'current_pos': None,'released_once': False}
     cv2.namedWindow(title)
     cv2.moveWindow(title, 100, 100)
 
@@ -36,10 +34,10 @@ def get_rect(im, title='get_rect'):   #   (a,b) = get_rect(im, title='get_rect')
         if mouse_params['tl'] is not None:
             y0, x0 = mouse_params['tl'][0], mouse_params['tl'][1]
             tl = (y0, x0)
-
             y1, x1 = mouse_params['current_pos'][0], mouse_params['current_pos'][1]
             width = x1 - x0
             height = y1 - y0
+
             if height > width:
                 cv2.rectangle(im_draw, mouse_params['tl'], (y0+height, x0+height), (255, 0, 0))
                 br = (y0 + height, x0 + height)
@@ -55,8 +53,8 @@ def get_rect(im, title='get_rect'):   #   (a,b) = get_rect(im, title='get_rect')
     return (tl, br)  #tl=(y1,x1), br=(y2,x2)
 
 def resize_and_label(img_Dir, ori_path, save_path, spilt, class_name, extension):
+
     if not os.path.exists(save_path +class_name):
-        os.mkdir(save_path)
         os.mkdir(save_path+class_name)
 
     for i in range(len(img_Dir)):
@@ -82,11 +80,11 @@ def resize_and_label(img_Dir, ori_path, save_path, spilt, class_name, extension)
 
 if __name__ == '__main__':
     # 原文件路径
-    ori_path = "./ZhaoLiying/"
+    ori_path = "../../ori_img/xuezhiqian/"
     img_Dir = os.listdir(ori_path)
-    save_path = '../data/dataset1/'
+    save_path = '../../data/dataset/'
     spilt = ','
-    class_name = 'ZhaoLiying'
+    class_name = 'xuezhiqian'
     extension = 'png'
     resize_and_label(img_Dir, ori_path, save_path, spilt, class_name, extension)
 

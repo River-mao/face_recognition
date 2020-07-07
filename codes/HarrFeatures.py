@@ -21,9 +21,11 @@
 import cv2
 import os
 from tool import normalization, save_dir, readImgCollection
-posPath = '../samples/size_24_t_50_num_2/pos/'
-negPath = '../samples/size_24_t_50_num_2/neg/'
-epsilonList = [0.4, 0.4, 0.4, 0.4, 0.4, 0.4]
+posPath = '../samples/size_24_t_30_90_num_3/pos/'
+negPath = '../samples/size_24_t_30_90_num_3/neg/'
+DirPath="../harrFeature/size_24_t_30_90_num_3"
+#18,16,14,12,10,8,6
+epsilonList = [0.33, 0.33, 0.33, 0.33, 0.33, 0.33, 0.33]
 
 class HarrFeatures(object):
 
@@ -57,17 +59,17 @@ class HarrFeatures(object):
         print(" cal the all the accepted Harr collection")
         #self.harrCollection18 = self.calAcceptedHarrCollection(self.harrCollection18All, self.epsilonList[0])
         self.harrCollection16 = self.calAcceptedHarrCollection(self.harrCollection16All, self.epsilonList[1])
-        save_dir(dir=harrFeatures.harrCollection16, name="harrColl16", harrDirPath="../harrFeature")
+        save_dir(dir=harrFeatures.harrCollection16, name="harrColl16", DirPath=DirPath)
         self.harrCollection14 = self.calAcceptedHarrCollection(self.harrCollection14All, self.epsilonList[2])
-        save_dir(dir=harrFeatures.harrCollection14, name="harrColl14", harrDirPath="../harrFeature")
+        save_dir(dir=harrFeatures.harrCollection14, name="harrColl14", DirPath=DirPath)
         self.harrCollection12 = self.calAcceptedHarrCollection(self.harrCollection12All, self.epsilonList[3])
-        save_dir(dir=harrFeatures.harrCollection12, name="harrColl12", harrDirPath="../harrFeature")
+        save_dir(dir=harrFeatures.harrCollection12, name="harrColl12", DirPath=DirPath)
         self.harrCollection10 = self.calAcceptedHarrCollection(self.harrCollection10All, self.epsilonList[4])
-        save_dir(dir=harrFeatures.harrCollection10, name="harrColl10", harrDirPath="../harrFeature")
+        save_dir(dir=harrFeatures.harrCollection10, name="harrColl10", DirPath=DirPath)
         self.harrCollection8 = self.calAcceptedHarrCollection(self.harrCollection8All, self.epsilonList[5])
-        save_dir(dir=harrFeatures.harrCollection8, name="harrColl8", harrDirPath="../harrFeature")
-        self.harrCollection6 = self.calAcceptedHarrCollection(self.harrCollection6All, self.epsilonList[5])
-        save_dir(dir=harrFeatures.harrCollection6, name="harrColl6", harrDirPath="../harrFeature")
+        save_dir(dir=harrFeatures.harrCollection8, name="harrColl8", DirPath=DirPath)
+        self.harrCollection6 = self.calAcceptedHarrCollection(self.harrCollection6All, self.epsilonList[6])
+        save_dir(dir=harrFeatures.harrCollection6, name="harrColl6", DirPath=DirPath)
 
         print("All the accepted harr collections done!")
 
@@ -91,7 +93,7 @@ class HarrFeatures(object):
             harrValueList = []
             for imgName in self.imgCollection.keys():
 
-                img = normalization(cv2.imread(imgName, cv2.COLOR_BGR2GRAY))
+                img = cv2.imread(imgName, cv2.COLOR_BGR2GRAY)
                 SATA, SATB, SATC, SATD = self.calBlockABCD(img, harrPosition)
                 harrValueCollection[imgName] = self.HarrAFeatures(SATA, SATB, SATC, SATD)
                 # (Harr特征值, label, imgName)
@@ -105,7 +107,7 @@ class HarrFeatures(object):
 
             # 通过calMinEpsilonIndex函数计算上述排好序的矩阵分类误差最小值，最小值的位置，不等号方向
             epsilon, epsilonindex, p = self.calMinEpsilonIndex(harrValueList)
-
+            print("epsilonindex", epsilonindex)
             # 这里我们取最小误差位置的Harr特征值与前一个位置的特征值的平均值作为该Harr模板的分类阈值
             boundHarrValue = (harrValueList[epsilonindex][0] + harrValueList[epsilonindex-1][0])/2
 

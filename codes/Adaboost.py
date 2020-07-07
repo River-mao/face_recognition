@@ -5,8 +5,8 @@ from HarrFeatures import HarrFeatures
 
 maxIters = 20
 
-posPath = '../samples/size_24_t_50_num_2/pos/'
-negPath = '../samples/size_24_t_50_num_2/neg/'
+posPath = '../samples/size_24_t_30_90_num_3/pos/'
+negPath = '../samples/size_24_t_30_90_num_3/neg/'
 harr16Path =  '../harrFeature/harrColl16.pkl'
 #harr8Path  =  '../harrFeature/harrColl8.pkl'
 #harr10Path =  '../harrFeature/harrColl10.pkl'
@@ -15,7 +15,7 @@ harr16Path =  '../harrFeature/harrColl16.pkl'
 
 class strongClassifier(object):
 
-    def __init__(self, harrTemp, imgCollection, maxIters = maxIters, harrFeatures = None):
+    def __init__(self, harrTemp, imgCollection, maxIters = maxIters, harrFeatures = HarrFeatures):
         '''
            O.......................
             .          .          .
@@ -39,7 +39,7 @@ class strongClassifier(object):
     # Boosting过程
     # 返回Adaboost的alpha值和对应的弱分类器的参数
 
-   def Boosting(self):
+    def Boosting(self):
         imgNum = len(self.imgCollection)
         # 数据集权重矩阵
         # 由于最后还会更新一次权重，需多出一维
@@ -66,7 +66,7 @@ class strongClassifier(object):
 
             imgindex = 0
             for imgName in self.imgCollection.keys():
-                img = normalization(cv2.imread(imgName, cv2.COLOR_BGR2GRAY))
+                img = cv2.imread(imgName, cv2.COLOR_BGR2GRAY)
                 harrValue, prediction = self.weakClassifier(img, curHarrTemp)
                 # harrValueCollection[imgName] = harrValue
                 # 记录当前图片在当前模板上的预测值（-1，1）
@@ -143,5 +143,6 @@ if __name__ == '__main__':
     Classifier.Boosting()
     testImg = normalization(cv2.imread('../samples/testImg/curry1_18.png', cv2.COLOR_BGR2GRAY))
     predicttion = Classifier.finalClassifier(testImg)
+    print("the prediction is:", predicttion)
     print("Done!")
 
